@@ -3,4 +3,6 @@ miniRT
 *.a
 *.o
 *.d
+*.idx
+*.json
 *.sublime-workspace
