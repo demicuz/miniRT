@@ -1,0 +1,6 @@
+miniRT
+
+*.a
+*.o
+*.d
+*.sublime-workspace
