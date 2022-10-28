@@ -1,0 +1,16 @@
+{
+	"folders":
+	[
+		{
+			"path": "."
+		}
+	],
+	"build_systems":
+	[
+		{
+			"working_dir": "$project_path",
+			"name": "Run miniRT",
+			"shell_cmd": "make miniRT && ./miniRT"
+		}
+	]
+}
