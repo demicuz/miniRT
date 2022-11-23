@@ -1,6 +1,8 @@
 #ifndef TYPES_H
 # define TYPES_H
 
+# include "vector.h"
+
 typedef struct s_imgdata
 {
 	void	*img_ptr;
@@ -33,5 +35,11 @@ typedef struct s_app
 }	t_app;
 
 typedef unsigned int	t_color;
+
+typedef struct s_cam
+{
+	t_vec3	pos;
+	t_vec3	dir;
+}	t_cam;
 
 # endif

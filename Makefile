@@ -15,7 +15,7 @@ OBJ			:= $(SRC:.c=.o)
 # TODO set correct flags
 CC			:= cc
 CPPFLAGS	:= -I include -I $(LIBFT_DIR) -I $(MLX_DIR) -MMD -MP -g
-CFLAGS		:= -Wall#-Werror -Wextra
+CFLAGS		:= -Wall -O1#-Werror -Wextra
 LDFLAGS		:= -L $(LIB_DIR)
 LDLIBS		:= -lft -lmlx -lXext -lX11 -lm -lz
 
@@ -39,15 +39,16 @@ $(NAME): $(OBJ) $(LIBFT) $(LIBMLX)
 $(LIB_DIR):
 	mkdir -p $@
 
+# TODO clean all
 clean:
 	rm -v $(OBJ)
 	rm -v $(OBJ:.o=.d)
-	$(MAKE) clean --directory=$(LIBFT_DIR)
-	$(MAKE) clean --directory=$(MLX_DIR)
+	# $(MAKE) clean --directory=$(LIBFT_DIR)
+	# $(MAKE) clean --directory=$(MLX_DIR)
 
 fclean: clean
 	rm $(NAME)
-	$(MAKE) fclean --directory=$(LIBFT_DIR)
+	# $(MAKE) fclean --directory=$(LIBFT_DIR)
 
 re: fclean all
 
