@@ -4,5 +4,7 @@ miniRT
 *.o
 *.d
 *.idx
+
+.cache
 *.json
 *.sublime-workspace
