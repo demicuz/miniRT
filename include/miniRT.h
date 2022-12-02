@@ -4,6 +4,8 @@
 # include "types.h"
 # include "x_events.h"
 
+#include <stdbool.h>
+
 # define VIEW_W 700
 # define VIEW_H 450
 # define ASPECT (float) VIEW_W / VIEW_H
@@ -27,5 +29,8 @@ t_color	correct_gamma(t_vec3 color, float gamma);
 // math_utils
 float	lerp(float a, float b, float t);
 float	clamp(float x, float lower, float upper);
+
+// parser
+bool	parse_objects(t_app *app);
 
 # endif

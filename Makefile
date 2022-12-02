@@ -15,7 +15,7 @@ OBJ			:= $(SRC:.c=.o)
 # TODO set correct flags
 CC			:= cc
 CPPFLAGS	:= -I include -I $(LIBFT_DIR) -I $(MLX_DIR) -MMD -MP -g
-CFLAGS		:= -Wall -O1#-Werror -Wextra
+CFLAGS		:= -Wall -O2#-Werror -Wextra
 LDFLAGS		:= -L $(LIB_DIR)
 LDLIBS		:= -lft -lmlx -lXext -lX11 -lm -lz
 

@@ -14,17 +14,62 @@ typedef struct s_imgdata
 	int		height;
 }	t_imgdata;
 
-typedef struct s_rtdata
+// typedef struct s_rtdata
+// {
+
+// }	t_rtdata;
+
+typedef unsigned int	t_color;
+
+// typedef struct s_cam
+// {
+// 	t_vec3	pos;
+// 	t_vec3	dir;
+// }	t_cam;
+
+typedef enum	e_obj_type {
+	PLANE,
+	SPHERE,
+	CYLINDER
+}	t_obj_type;
+
+typedef struct	s_sphere
 {
-	double	x;
-	double	y;
-	double	zoom;
-	int		max_iter;
-	int		fr_type;
-	int		color_type;
-	double	c_re;
-	double	c_im;
-}	t_rtdata;
+	// t_material	material;
+	t_vec3		pos;
+	float		radius;
+	t_vec3		color;
+}	t_sphere;
+
+typedef struct	s_plane
+{
+	t_vec3		normal;
+	float		h;
+	t_vec3		color;
+}	t_plane;
+
+typedef struct	s_cylinder
+{
+	t_vec3	pos;
+	t_vec3	color;
+}	t_cylinder;
+
+typedef struct	s_obj
+{
+	t_obj_type	type;
+	union
+	{
+		t_sphere	sphere;
+		t_plane		plane;
+		t_cylinder	cylinder;
+	};
+}	t_obj;
+
+typedef struct	s_light
+{
+	t_vec3	pos;
+	float	brightness;
+}	t_light;
 
 typedef struct s_app
 {
@@ -32,14 +77,10 @@ typedef struct s_app
 	void		*win;
 	t_imgdata	*img;
 	// t_rtdata	*rtdata;
+
+	t_light		light;
+	int			obj_count;
+	t_obj		objects[4]; // TODO malloc
 }	t_app;
-
-typedef unsigned int	t_color;
-
-typedef struct s_cam
-{
-	t_vec3	pos;
-	t_vec3	dir;
-}	t_cam;
 
 # endif

@@ -23,11 +23,11 @@ t_color	rgb(float r, float g, float b)
 	t_color	color;
 
 	color = 0;
-	color += r * 255.0f;
+	color += r * 255.0F;
 	color <<= 8;
-	color += g * 255.0f;
+	color += g * 255.0F;
 	color <<= 8;
-	color += b * 255.0f;
+	color += b * 255.0F;
 	return (color);
 }
 
@@ -37,14 +37,14 @@ t_color	vec3_to_color(t_vec3 v)
 	t_color	color;
 
 	color = 0;
-	color += v.x * 255.0f;
-	// color += fmodf(v.x, 1.0f) * 255.0f;
+	color += v.x * 255.0F;
+	// color += fmodf(v.x, 1.0F) * 255.0F;
 	color <<= 8;
-	color += v.y * 255.0f;
-	// color += fmodf(v.y, 1.0f) * 255.0f;
+	color += v.y * 255.0F;
+	// color += fmodf(v.y, 1.0F) * 255.0F;
 	color <<= 8;
-	color += v.z * 255.0f;
-	// color += fmodf(v.z, 1.0f) * 255.0f;
+	color += v.z * 255.0F;
+	// color += fmodf(v.z, 1.0F) * 255.0F;
 	return (color);
 }
 
@@ -52,8 +52,8 @@ t_color	correct_gamma(t_vec3 color, float gamma)
 {
 	t_vec3	result;
 
-	result.x = powf(color.x, 1.0f / gamma);
-	result.y = powf(color.y, 1.0f / gamma);
-	result.z = powf(color.z, 1.0f / gamma);
+	result.x = powf(color.x, 1.0F / gamma);
+	result.y = powf(color.y, 1.0F / gamma);
+	result.z = powf(color.z, 1.0F / gamma);
 	return (vec3_to_color(result));
 }
