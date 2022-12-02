@@ -1,0 +1,1 @@
+Checks: 'bugprone-*,cert-*,clang-analyzer-*,linuxkernel-*,misc-*,performance-*,readability-*,-readability-braces-around-statements,-readability-identifier-length,-readability-magic-numbers,-bugprone-easily-swappable-parameters'
