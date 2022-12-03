@@ -84,30 +84,39 @@ t_color	background(const t_ray3 *ray)
 	return vec3_to_color(color);
 }
 
-t_color	render_sphere(const t_ray3 *ray, t_sphere *sphere, float dist, t_light *light)
+t_color	render_sphere(const t_ray3 *ray, t_sphere *sphere, float dist, t_app *app)
 {
-	t_vec3 hit = at(ray, dist);
-	t_vec3 n = normalize(v_sub(hit, sphere->pos)); // TODO sphere of 0 diameter
+	t_light *light = &app->light;
+
+	t_vec3 hit       = at(ray, dist);
+	t_vec3 n         = normalize(v_sub(hit, sphere->pos)); // TODO sphere of 0 diameter
+	t_vec3 light_dir = normalize(v_sub(light->pos, hit));
 	// TODO if inside of the sphere, do this:
 	// n.x = -n.x;
 	// n.y = -n.y;
 	// n.z = -n.z;
 
-	t_vec3 light_dir = normalize(v_sub(light->pos, hit));
-	float illumination = clamp(dot(n, light_dir), 0.0F, 1.0F);
-	t_vec3 final_color = v_mul(sphere->color, illumination);
-
+	float ill_factor = fmaxf(dot(n, light_dir), 0);
+	t_vec3 ill_color = v_mulv(sphere->color, light->color);
+	// float spot_light = fmaxf(-dot(n, ray->dir), 0);
+	// t_vec3 final_color = v_add(v_mul(sphere->color, ill_factor), v_mul(sphere->color, 0.1F));
+	t_vec3 final_color = v_mul(ill_color, ill_factor);
+	final_color = v_add(final_color, v_mul(ill_color, app->ambient_light)); // Ambient light
+	// final_color = v_mul(final_color, spot_light);
+	final_color = v_min(final_color, 1.0F);
 	return vec3_to_color(final_color);
 	// n.z = -n.z;
 	// t_vec3 color = v_mul(v_add(n, vec3(1, 1, 1)), 0.5F);
 	// return vec3_to_color(color);
 }
 
-t_color	render_plane(const t_ray3 *ray, t_plane *plane, float dist, t_light *light)
+t_color	render_plane(const t_ray3 *ray, t_plane *plane, float dist, t_app *app)
 {
+	t_light *light = &app->light;
+
 	t_vec3 hit = at(ray, dist);
 	t_vec3 light_dir = normalize(v_sub(light->pos, hit));
-	float illumination = clamp(dot(plane->normal, light_dir), 0.0F, 1.0F);
+	float illumination = fmaxf(dot(plane->normal, light_dir), 0.0F);
 	t_vec3 final_color = v_mul(plane->color, illumination);
 
 	return vec3_to_color(final_color);
@@ -154,9 +163,9 @@ t_color	get_pixel_color(int x, int y, t_app *app)
 	if (!hit_obj)
 		return background(&ray);
 	if (hit_obj->type == SPHERE)
-		return render_sphere(&ray, &hit_obj->sphere, dist, &app->light);
+		return render_sphere(&ray, &hit_obj->sphere, dist, app);
 	if (hit_obj->type == PLANE)
-		return render_plane(&ray, &hit_obj->plane, dist, &app->light);
+		return render_plane(&ray, &hit_obj->plane, dist, app);
 	puts("object not implemented!");
 	exit(1);
 }

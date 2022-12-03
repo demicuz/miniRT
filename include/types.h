@@ -68,7 +68,8 @@ typedef struct	s_obj
 typedef struct	s_light
 {
 	t_vec3	pos;
-	float	brightness;
+	// float	brightness;
+	t_vec3	color;
 }	t_light;
 
 typedef struct s_app
@@ -78,6 +79,7 @@ typedef struct s_app
 	t_imgdata	*img;
 	// t_rtdata	*rtdata;
 
+	float		ambient_light;
 	t_light		light;
 	int			obj_count;
 	t_obj		objects[4]; // TODO malloc

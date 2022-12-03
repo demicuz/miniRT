@@ -17,6 +17,8 @@ bool	parse_objects(t_app *app) {
 	app->objects[3].type = PLANE;
 	app->objects[3].plane = (t_plane) {.normal = vec3(0, 1, 0), .h = 1.0F, .color = vec3(0.9F, 0.9F, 0.9F)};
 
-	app->light = (t_light) {.pos = vec3(1, 5, 1), .brightness = 1};
+	app->light = (t_light) {.pos = vec3(1, 2, 1), .color = vec3(.7F, .7F, .7F)};
+
+	app->ambient_light = 0.3F;
 	return (true);
 }

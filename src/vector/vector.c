@@ -42,6 +42,26 @@ t_vec3	v_mul(t_vec3 v, float factor)
 	return (result);
 }
 
+t_vec3	v_mulv(t_vec3 v, t_vec3 factor)
+{
+	t_vec3	result;
+
+	result.x = v.x * factor.x;
+	result.y = v.y * factor.y;
+	result.z = v.z * factor.z;
+	return (result);
+}
+
+t_vec3	v_min(t_vec3 a, float min)
+{
+	t_vec3	result;
+
+	result.x = fminf(a.x, min);
+	result.y = fminf(a.y, min);
+	result.z = fminf(a.z, min);
+	return (result);
+}
+
 float	dot(t_vec3 a, t_vec3 b)
 {
 	return (a.x * b.x + a.y * b.y + a.z * b.z);
