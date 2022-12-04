@@ -59,19 +59,14 @@ float	hit_plane(t_vec3 n, float h, const t_ray3 *ray)
 	return (-(dot(ray->orig, n) + h) / dot(ray->dir, n));
 }
 
-float	hit_sphere_iq(t_vec3 center, float radius, const t_ray3 *ray)
+float	hit_plane_new(t_vec3 p, t_vec3 normal, const t_ray3 *ray)
 {
-	t_vec3	oc;
+	float	d;
+	float	t;
 
-	oc = v_sub(ray->orig, center);
-	float b = dot(oc, ray->dir);
-	// if (b > radius * radius)
-		// return -1.0f;
-	float c = dot(oc, oc) - radius * radius;
-	float h = b * b - c;
-	if (h < 0)
-		return (-1.0F);
-	return -b - sqrtf(h);
+	d = -dot(p, normal);
+	t = -(d + dot(ray->orig, normal)) / dot(ray->dir, normal);
+	return (t);
 }
 
 t_color	background(const t_ray3 *ray)
@@ -84,28 +79,36 @@ t_color	background(const t_ray3 *ray)
 	return vec3_to_color(color);
 }
 
-// t_color	phong(t_vec3 N, t_vec3 V, t_light *light, float shininess)
+t_color	phong(t_vec3 N, t_vec3 V, t_light *light, float shininess)
+{
+	return 0x0;
+}
 
-// t_color	render_sphere(const t_ray3 *ray, t_obj *obj, float dist, t_app *app)
-t_color	render_sphere(const t_ray3 *ray, t_sphere *sphere, float dist, t_app *app)
+t_color	render_sphere(const t_ray3 *ray, t_obj *obj, float dist, t_app *app)
 {
 	t_light *light = &app->light;
 
 	t_vec3	hit             = at(ray, dist);
-	t_vec3	n               = normalize(v_sub(hit, sphere->pos)); // TODO sphere of 0 diameter
+	t_vec3	n               = normalize(v_sub(hit, obj->pos)); // TODO sphere of 0 diameter
 	t_vec3	light_dir       = v_sub(light->pos, hit);
 	// t_vec3	light_dir       = vec3(-1, 1, -4); // Sunlight
 	float	light_intensity = 1.0F / dot(light_dir, light_dir);
 
 	light_dir = normalize(light_dir);
-	if (sphere->inside)
+	if (obj->inside)
 		n = vec3(-n.x, -n.y, -n.z);
 
 	float lambertian = fmaxf(dot(n, light_dir), 0);
-	t_vec3 ill_color = v_mulv(sphere->color, light->color);
+	t_vec3 ill_color = v_mulv(obj->color, light->color);
 
 	// Ambient light
-	t_vec3 ambient = v_mul(ill_color, app->ambient_light * light_intensity);
+	t_vec3	ambient = v_mul(ill_color, app->ambient_light * light_intensity);
+
+	// t_vec3 ambient;
+	// if (lambertian > 0)
+		// ambient = v_mul(ill_color, app->ambient_light * light_intensity);
+	// else
+		// ambient = vec3(0, 0, 0);
 
 	// Diffuse light
 	t_vec3 diffusion = v_mul(v_mul(ill_color, lambertian), light->brightness * light_intensity);
@@ -113,21 +116,18 @@ t_color	render_sphere(const t_ray3 *ray, t_sphere *sphere, float dist, t_app *ap
 	// Specular reflection, Blinn-Phong
 	t_vec3 H = normalize(v_sub(light_dir, ray->dir));
 	float blinnTerm = fmaxf(dot(n, H), 0);
-	// float blinnTerm = fmaxf(-dot(n, ray->dir), 0);
-	float specular = powf(blinnTerm, sphere->shininess) * .1F;
-	// final_color = v_mul(final_color, specular);
+	float spec_factor = powf(blinnTerm, obj->shininess) * light_intensity * obj->shininess;
+	t_vec3	specular = v_mul(light->color, spec_factor);
 
-	// Specular reflection, Phong
-	// t_vec3 reflected_cam = reflect(ray->dir, n);
-	// float phongTerm = fmaxf(dot(reflected_cam, light_dir), 0);
-	// float specular = powf(phongTerm, sphere->shininess / 4.0F) * 100.0F;
-
-	t_vec3 final_color = v_add(diffusion, ambient);
-	// t_vec3 final_color = v_add(diffusion, vec3(0, 0, 0));
-	final_color = v_add(final_color, vec3(specular, specular, specular));
+	t_vec3	final_color = vec3(0, 0, 0);
+	final_color = v_add(ambient, final_color);
+	final_color = v_add(diffusion, final_color);
+	final_color = v_add(specular, final_color);
 
 
-	final_color = v_min(final_color, 1.0F);
+	final_color = v_divv(final_color, v_add(final_color, vec3(1, 1, 1)));
+	// final_color = v_min(final_color, 1.0F);
+
 	// return vec3_to_color(final_color);
 	return correct_gamma(final_color, GAMMA);
 	// n.z = -n.z;
@@ -135,14 +135,14 @@ t_color	render_sphere(const t_ray3 *ray, t_sphere *sphere, float dist, t_app *ap
 	// return vec3_to_color(color);
 }
 
-t_color	render_plane(const t_ray3 *ray, t_plane *plane, float dist, t_app *app)
+t_color	render_plane(const t_ray3 *ray, t_obj *obj, float dist, t_app *app)
 {
 	t_light *light = &app->light;
 
 	t_vec3 hit = at(ray, dist);
 	t_vec3 light_dir = normalize(v_sub(light->pos, hit));
-	float illumination = fmaxf(dot(plane->normal, light_dir), 0.0F);
-	t_vec3 final_color = v_mul(plane->color, illumination);
+	float illumination = fmaxf(dot(obj->plane.normal, light_dir), 0.0F);
+	t_vec3 final_color = v_mul(obj->color, illumination);
 
 	return vec3_to_color(final_color);
 }
@@ -155,13 +155,15 @@ t_obj *cast(const t_ray3 *ray, t_obj objects[], int obj_count, float *dist)
 
 	hit = NULL;
 	i = 0;
+	current_dist = 0;
 	while (i < obj_count)
 	{
 		if (objects[i].type == SPHERE)
 			// TODO looks ugly
-			current_dist = hit_sphere(objects[i].sphere.pos, objects[i].sphere.radius, ray, &objects[i].sphere.inside);
+			current_dist = hit_sphere(objects[i].pos, objects[i].sphere.radius, ray, &objects[i].inside);
 		else if (objects[i].type == PLANE)
-			current_dist = hit_plane(objects[i].plane.normal, objects[i].plane.h, ray);
+			// current_dist = hit_plane(objects[i].plane.normal, 1, ray);
+			current_dist = hit_plane_new(objects[i].pos, objects[i].plane.normal, ray);
 		if (current_dist > 0.0F && current_dist < *dist)
 		{
 			*dist = current_dist;
@@ -189,9 +191,9 @@ t_color	get_pixel_color(int x, int y, t_app *app)
 	if (!hit_obj)
 		return background(&ray);
 	if (hit_obj->type == SPHERE)
-		return render_sphere(&ray, &hit_obj->sphere, dist, app);
+		return render_sphere(&ray, hit_obj, dist, app);
 	if (hit_obj->type == PLANE)
-		return render_plane(&ray, &hit_obj->plane, dist, app);
+		return render_plane(&ray, hit_obj, dist, app);
 	puts("object not implemented!");
 	exit(1);
 }

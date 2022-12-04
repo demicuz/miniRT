@@ -71,6 +71,7 @@ t_vec3	v_add(t_vec3 a, t_vec3 b);
 t_vec3	v_sub(t_vec3 a, t_vec3 b);
 t_vec3	v_mul(t_vec3 v, float factor);
 t_vec3	v_mulv(t_vec3 v, t_vec3 factor);
+t_vec3	v_divv(t_vec3 v, t_vec3 factor);
 t_vec3	v_min(t_vec3 a, float min);
 float	dot(t_vec3 a, t_vec3 b);
 float	length(t_vec3 a);

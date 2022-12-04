@@ -5,22 +5,44 @@
 
 bool	parse_objects(t_app *app) {
 	app->obj_count = 5;
-	app->objects[0].type = SPHERE;
-	app->objects[0].color = vec3(1, 0, 0);
-	app->objects[0].shininess = 30.0F;
-	app->objects[0].sphere = (t_sphere) {.pos = vec3(-2.5F, 0, 6.0F), .radius = 1.0F, .shininess = 5.0F, .color = vec3(1, 0, 0)};
+	t_obj *o;
 
-	app->objects[1].type = SPHERE;
-	app->objects[1].sphere = (t_sphere) {.pos = vec3(0, 0, 6.0F), .radius = 1.0F, .shininess = 30.0F, .color = vec3(0, 1, 0)};
+	o            = &app->objects[0];
+	o->type      = SPHERE;
+	o->color     = vec3(1, 0, 0);
+	o->shininess = 30.0F;
+	o->pos       = vec3(-2.5F, 0, 6.0F);
+	o->sphere    = (t_sphere) {.radius = 1.0F};
 
-	app->objects[2].type = SPHERE;
-	app->objects[2].sphere = (t_sphere) {.pos = vec3(2.5F, 0, 6.0F), .radius = 1.0F, .shininess = 60.0F, .color = vec3(0, 0, 1)};
+	o            = &app->objects[1];
+	o->type      = SPHERE;
+	o->color     = vec3(0, 1, 0);
+	o->shininess = 20.0F;
+	o->pos       = vec3(0, 0, 6.0F);
+	o->sphere    = (t_sphere) {.radius = 1.0F};
 
-	app->objects[3].type = SPHERE;
-	app->objects[3].sphere = (t_sphere) {.pos = vec3(-1, 1, 2), .radius = .1F, .shininess = 30.0F, .color = vec3(1, 1, 1)};
+	o            = &app->objects[2];
+	o->type      = SPHERE;
+	o->color     = vec3(0, 0, 1);
+	o->shininess = 10.0F;
+	o->pos       = vec3(2.5F, 0, 6.0F);
+	o->sphere    = (t_sphere) {.radius = 1.0F};
 
-	app->objects[4].type = PLANE;
-	app->objects[4].plane = (t_plane) {.normal = vec3(0, 1, 0), .h = 1.0F, .color = vec3(0.8F, 0.8F, 0.8F)};
+	o            = &app->objects[3];
+	o->type      = SPHERE;
+	o->color     = vec3(1, 0, 0);
+	o->shininess = 0.0F;
+	o->pos       = vec3(-1, 1, 2);
+	o->color     = vec3(0.8F, 0.8F, 0.8F);
+	o->sphere    = (t_sphere) {.radius = .05F};
+
+	o            = &app->objects[4];
+	o->type      = PLANE;
+	o->color     = vec3(0.8F, 0.8F, 0.8F);
+	o->shininess = 0.0F;
+	o->pos       = vec3(0, -1, 0);
+	o->color     = vec3(0.8F, 0.8F, 0.8F);
+	o->plane     = (t_plane) {.normal = vec3(0, 1, 0)};
 
 	app->light = (t_light) {.pos = vec3(-1, 1, 2), .brightness = 20, .color = vec3(.7F, .7F, .7F)};
 

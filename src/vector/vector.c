@@ -52,6 +52,16 @@ t_vec3	v_mulv(t_vec3 v, t_vec3 factor)
 	return (result);
 }
 
+t_vec3	v_divv(t_vec3 v, t_vec3 factor)
+{
+	t_vec3	result;
+
+	result.x = v.x / factor.x;
+	result.y = v.y / factor.y;
+	result.z = v.z / factor.z;
+	return (result);
+}
+
 t_vec3	v_min(t_vec3 a, float min)
 {
 	t_vec3	result;
