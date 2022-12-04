@@ -6,8 +6,8 @@
 
 #include <stdbool.h>
 
-# define VIEW_W 700
-# define VIEW_H 450
+# define VIEW_W 1400
+# define VIEW_H 900
 # define ASPECT (float) VIEW_W / VIEW_H
 
 // Camera settings, TODO the camera can be positioned

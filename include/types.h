@@ -1,6 +1,8 @@
 #ifndef TYPES_H
 # define TYPES_H
 
+# include <stdbool.h>
+
 # include "vector.h"
 
 typedef struct s_imgdata
@@ -35,9 +37,10 @@ typedef enum	e_obj_type {
 
 typedef struct	s_sphere
 {
-	// t_material	material;
+	bool		inside;
 	t_vec3		pos;
 	float		radius;
+	float		shininess;
 	t_vec3		color;
 }	t_sphere;
 
@@ -45,30 +48,34 @@ typedef struct	s_plane
 {
 	t_vec3		normal;
 	float		h;
+	float		shininess;
 	t_vec3		color;
 }	t_plane;
 
 typedef struct	s_cylinder
 {
 	t_vec3	pos;
+	float	shininess;
 	t_vec3	color;
 }	t_cylinder;
 
 typedef struct	s_obj
 {
-	t_obj_type	type;
 	union
 	{
 		t_sphere	sphere;
 		t_plane		plane;
 		t_cylinder	cylinder;
 	};
+	t_vec3		color;
+	float		shininess;
+	t_obj_type	type;
 }	t_obj;
 
 typedef struct	s_light
 {
 	t_vec3	pos;
-	// float	brightness;
+	float	brightness;
 	t_vec3	color;
 }	t_light;
 
@@ -82,7 +89,7 @@ typedef struct s_app
 	float		ambient_light;
 	t_light		light;
 	int			obj_count;
-	t_obj		objects[4]; // TODO malloc
+	t_obj		objects[5]; // TODO malloc
 }	t_app;
 
 # endif

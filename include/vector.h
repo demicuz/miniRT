@@ -77,5 +77,6 @@ float	length(t_vec3 a);
 t_vec3	normalize(t_vec3 a);
 t_vec3	v_lerp(t_vec3 *a, t_vec3 *b, float t);
 t_vec3	at(const t_ray3 *r, float t);
+t_vec3	reflect(t_vec3 incident, t_vec3 normal);
 
 # endif

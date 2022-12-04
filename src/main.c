@@ -30,18 +30,18 @@
 //     return true;
 // }
 
-float	hit_sphere(t_vec3 center, float radius, const t_ray3 *ray)
+float	hit_sphere(t_vec3 center, float radius, const t_ray3 *ray, bool *inside)
 {
 	t_vec3 OC = v_sub(center, ray->orig);
 
-	bool inside = false;
-	if (dot(OC, OC) < radius * radius)
+	*inside = false;
+	if (dot(OC, OC) <= radius * radius)
 	{
-		inside = true;
+		*inside = true;
 		return 1.0F;
 	}
 	float OH_len = dot(OC, ray->dir);
-	if (OH_len < 0 && !inside)
+	if (OH_len < 0 && !*inside)
 		return -1.0F;
 
 	float CH_len_sq = dot(OC, OC) - OH_len * OH_len;
@@ -49,7 +49,7 @@ float	hit_sphere(t_vec3 center, float radius, const t_ray3 *ray)
 		return -1.0F;
 	float XH_len_sq = radius * radius - CH_len_sq;
 
-	if (!inside)
+	if (!*inside)
 		return (OH_len - sqrtf(XH_len_sq));
 	return (OH_len + sqrtf(XH_len_sq));
 }
@@ -84,27 +84,52 @@ t_color	background(const t_ray3 *ray)
 	return vec3_to_color(color);
 }
 
+// t_color	phong(t_vec3 N, t_vec3 V, t_light *light, float shininess)
+
+// t_color	render_sphere(const t_ray3 *ray, t_obj *obj, float dist, t_app *app)
 t_color	render_sphere(const t_ray3 *ray, t_sphere *sphere, float dist, t_app *app)
 {
 	t_light *light = &app->light;
 
-	t_vec3 hit       = at(ray, dist);
-	t_vec3 n         = normalize(v_sub(hit, sphere->pos)); // TODO sphere of 0 diameter
-	t_vec3 light_dir = normalize(v_sub(light->pos, hit));
-	// TODO if inside of the sphere, do this:
-	// n.x = -n.x;
-	// n.y = -n.y;
-	// n.z = -n.z;
+	t_vec3	hit             = at(ray, dist);
+	t_vec3	n               = normalize(v_sub(hit, sphere->pos)); // TODO sphere of 0 diameter
+	t_vec3	light_dir       = v_sub(light->pos, hit);
+	// t_vec3	light_dir       = vec3(-1, 1, -4); // Sunlight
+	float	light_intensity = 1.0F / dot(light_dir, light_dir);
 
-	float ill_factor = fmaxf(dot(n, light_dir), 0);
+	light_dir = normalize(light_dir);
+	if (sphere->inside)
+		n = vec3(-n.x, -n.y, -n.z);
+
+	float lambertian = fmaxf(dot(n, light_dir), 0);
 	t_vec3 ill_color = v_mulv(sphere->color, light->color);
-	// float spot_light = fmaxf(-dot(n, ray->dir), 0);
-	// t_vec3 final_color = v_add(v_mul(sphere->color, ill_factor), v_mul(sphere->color, 0.1F));
-	t_vec3 final_color = v_mul(ill_color, ill_factor);
-	final_color = v_add(final_color, v_mul(ill_color, app->ambient_light)); // Ambient light
-	// final_color = v_mul(final_color, spot_light);
+
+	// Ambient light
+	t_vec3 ambient = v_mul(ill_color, app->ambient_light * light_intensity);
+
+	// Diffuse light
+	t_vec3 diffusion = v_mul(v_mul(ill_color, lambertian), light->brightness * light_intensity);
+
+	// Specular reflection, Blinn-Phong
+	t_vec3 H = normalize(v_sub(light_dir, ray->dir));
+	float blinnTerm = fmaxf(dot(n, H), 0);
+	// float blinnTerm = fmaxf(-dot(n, ray->dir), 0);
+	float specular = powf(blinnTerm, sphere->shininess) * .1F;
+	// final_color = v_mul(final_color, specular);
+
+	// Specular reflection, Phong
+	// t_vec3 reflected_cam = reflect(ray->dir, n);
+	// float phongTerm = fmaxf(dot(reflected_cam, light_dir), 0);
+	// float specular = powf(phongTerm, sphere->shininess / 4.0F) * 100.0F;
+
+	t_vec3 final_color = v_add(diffusion, ambient);
+	// t_vec3 final_color = v_add(diffusion, vec3(0, 0, 0));
+	final_color = v_add(final_color, vec3(specular, specular, specular));
+
+
 	final_color = v_min(final_color, 1.0F);
-	return vec3_to_color(final_color);
+	// return vec3_to_color(final_color);
+	return correct_gamma(final_color, GAMMA);
 	// n.z = -n.z;
 	// t_vec3 color = v_mul(v_add(n, vec3(1, 1, 1)), 0.5F);
 	// return vec3_to_color(color);
@@ -133,7 +158,8 @@ t_obj *cast(const t_ray3 *ray, t_obj objects[], int obj_count, float *dist)
 	while (i < obj_count)
 	{
 		if (objects[i].type == SPHERE)
-			current_dist = hit_sphere(objects[i].sphere.pos, objects[i].sphere.radius, ray);
+			// TODO looks ugly
+			current_dist = hit_sphere(objects[i].sphere.pos, objects[i].sphere.radius, ray, &objects[i].sphere.inside);
 		else if (objects[i].type == PLANE)
 			current_dist = hit_plane(objects[i].plane.normal, objects[i].plane.h, ray);
 		if (current_dist > 0.0F && current_dist < *dist)

@@ -98,3 +98,8 @@ t_vec3	at(const t_ray3 *r, float t)
 {
 	return (v_add(r->orig, v_mul(r->dir, t)));
 }
+
+t_vec3	reflect(t_vec3 incident, t_vec3 normal)
+{
+	return v_sub(incident, v_mul(normal, 2 * dot(normal, incident)));
+}
